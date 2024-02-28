@@ -1,0 +1,23 @@
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+expenses = []
+
+@app.route('/')
+def index():
+    return render_template('index.html', expenses=expenses)
+
+@app.route('/add_expense', methods=['POST'])
+def add_expense():
+    description = request.form['description']
+    amount = float(request.form['amount'])
+    payer = request.form['payer']
+    participants = request.form.getlist('participants')
+    split_amount = amount / (len(participants) + 1)
+    for participant in participants:
+        expenses.append({'description': description, 'amount': split_amount, 'payer': payer, 'participant': participant})
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
